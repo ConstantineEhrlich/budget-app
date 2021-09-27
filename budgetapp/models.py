@@ -48,7 +48,7 @@ class Transaction(models.Model):
     def get_monthly_expenses(self, month):
         response = {}
         for category in Category.objects.all():
-            response[]
+            response[category.name] = ''
             for m in range(1, month):
                 response[category.code] = category.objects.annotate()
         pass
