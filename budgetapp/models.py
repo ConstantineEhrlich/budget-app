@@ -157,16 +157,32 @@ def refresh_data():
 def get_monthly_expenses():
     response = []
     qset = Transaction.objects.all()
-    for cat in Category.objects.all():
+    # run through categories
+    for cat in Category.objects.filter(code__gt=10):
         result = {}
         sums = []
         for mon in range(1, 13):
             qry = qset.filter(category=cat, month=mon).aggregate(Sum('amount'))
             if qry['amount__sum'] == None:
-                sums.append(0)
+                sums.append('-')
             else:
-                sums.append(qry['amount__sum'])
+                num = '{:,}'.format(qry['amount__sum'])
+                sums.append(num)
         result['name'] = cat.name
         result['sums'] = sums
         response.append(result)
+
+    # calculate totals per category
+    result = {}
+    sums = []
+    for mon in range(1, 13):
+        qry = qset.filter(month=mon).aggregate(Sum('amount'))
+        if qry['amount__sum'] == None:
+            sums.append('-')
+        else:
+            num = '{:,}'.format(qry['amount__sum'])
+            sums.append(num)
+    result['name'] = 'Year Total'
+    result['sums'] = sums
+    response.append(result)
     return response

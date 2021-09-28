@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p>Test text some text</p>
-    <table class="table table-hover table-sm">
+    <h3>Expense summary by month:</h3>
+    <table class="table table-hover table-sm table-bordered">
         <thead class="table-light">
         <th>Category</th>
         {% for per in periods %}
-            <th>{{ per }}</th>
+            <th style="text-align: center">{{ per.short_name }}</th>
         {% endfor %}
         </thead>
         {% for i in expenses %}
             <tr>
-            <td> {{ i.name }} </td>
+            <td> <b>{{ i.name }}</b> </td>
             {% for mon in i.sums %}
-                <td>{{ mon }}</td>
+                <td style="text-align: right">{{ mon }}</td>
             {% endfor %}
             </tr>
         {% endfor %}
