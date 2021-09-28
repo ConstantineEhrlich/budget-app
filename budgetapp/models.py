@@ -47,8 +47,6 @@ class Transaction(models.Model):
         return reverse('model-detail-view', args=[str(self.id)])
 
 
-
-
 class Budget_Line(models.Model):
     bdgt_types = [('bsl', 'Baseline'), ('spc', 'Special')]
     budget = models.ForeignKey('Budget', on_delete=models.PROTECT, to_field='code')
@@ -153,6 +151,7 @@ def refresh_data():
     import_csv_file(imp_budgets, 'bdgt')
     import_csv_file(imp_expenses, 'trns')
     import_csv_file(imp_liabilities, 'trns')
+
 
 def get_monthly_expenses():
     response = []

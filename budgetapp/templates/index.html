@@ -11,10 +11,10 @@
         </thead>
         {% for i in expenses %}
             <tr>
-            <td> <b>{{ i.name }}</b> </td>
-            {% for mon in i.sums %}
-                <td style="text-align: right">{{ mon }}</td>
-            {% endfor %}
+                <td><b>{{ i.name }}</b></td>
+                {% for mon in i.sums %}
+                    <td style="text-align: right">{{ mon }}
+                {% endfor %}
             </tr>
         {% endfor %}
     </table>
