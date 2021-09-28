@@ -13,13 +13,16 @@ def index(request):
         #.values('name')\
         #.annotate(amount=Sum('transaction__amount'))
 
+
+
     context = {
-        'data': [{'name': 'Food', 'amount': 2977}, {'name': 'H&S', 'amount': 1225}]
+        'expenses': get_monthly_expenses(),
+        'periods': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     }
     return render(request, 'index.html', context=context)
 
 def testview(request):
-
+    context = Context()
     return render(request, 'index.html', context=context)
 
 class CategoryListView(generic.ListView):

@@ -2,7 +2,8 @@ import csv
 from django.db import models
 from datetime import datetime
 
-from django.db.models import Max
+from django.db.models import Max, Sum
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.urls import reverse
 
@@ -45,13 +46,7 @@ class Transaction(models.Model):
     def get_absolute_url(self):
         return reverse('model-detail-view', args=[str(self.id)])
 
-    def get_monthly_expenses(self, month):
-        response = {}
-        for category in Category.objects.all():
-            response[category.name] = ''
-            for m in range(1, month):
-                response[category.code] = category.objects.annotate()
-        pass
+
 
 
 class Budget_Line(models.Model):
@@ -158,3 +153,20 @@ def refresh_data():
     import_csv_file(imp_budgets, 'bdgt')
     import_csv_file(imp_expenses, 'trns')
     import_csv_file(imp_liabilities, 'trns')
+
+def get_monthly_expenses():
+    response = []
+    qset = Transaction.objects.all()
+    for cat in Category.objects.all():
+        result = {}
+        sums = []
+        for mon in range(1, 13):
+            qry = qset.filter(category=cat, month=mon).aggregate(Sum('amount'))
+            if qry['amount__sum'] == None:
+                sums.append(0)
+            else:
+                sums.append(qry['amount__sum'])
+        result['name'] = cat.name
+        result['sums'] = sums
+        response.append(result)
+    return response
