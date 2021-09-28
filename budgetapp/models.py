@@ -154,6 +154,7 @@ def refresh_data():
 
 
 def get_monthly_expenses():
+    # TODO move this logic into Budget class
     response = []
     qset = Transaction.objects.all()
     # run through categories
