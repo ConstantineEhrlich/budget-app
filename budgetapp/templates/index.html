@@ -6,7 +6,9 @@
         <thead class="table-light">
         <th>Category</th>
         {% for per in periods %}
-            <th style="text-align: center">{{ per.short_name }}</th>
+            <th style="text-align: center">
+                <a href="{% url 'monthly_budget' per.num %}">{{ per.short_name }}</a>
+            </th>
         {% endfor %}
         </thead>
         {% for i in expenses %}
