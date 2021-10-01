@@ -19,6 +19,17 @@ from django.urls import reverse
 #   $ python manage.py migrate
 
 
+# TODO Add for_budget, for_year, for_month and for_category
+# TODO Add abstract class "transaction" and then three inherited classes: Budget_Line, Outcome, Income
+# TODO Add foreign key to Categories - budget
+# TODO Add BooleanField() to Categories - income, expense, liability, budget - if the category applicable to this trans type
+# TODO Add for_income, for_expense, for_liability, for_budget to the Category
+# TODO update Budget_Line.save() so if the category is not open for expense or liability it will become open
+
+
+
+
+
 # Create your models here.
 class Transaction(models.Model):
     trns_types = [('exp', 'Expense'), ('lia', 'Liability'), ('inc', 'Income')]
@@ -88,10 +99,59 @@ class Budget(models.Model):
         return reverse('model-detail-view', args=[str(self.id)])
 
     def get_current_month(self):
-        current_month = Transaction\
-            .objects.filter(trns_type='exp', budget=self.code)\
+        current_month = Transaction.objects \
+            .filter(trns_type='exp', budget=self.code) \
             .values('month').aggregate(month=Max('month'))
         return current_month['month']
+
+    def get_monthly_values(self, category):
+        result = []
+        qset_bdgt = Budget_Line.objects.filter(budget=self).all()
+        qset_trns = Transaction.objects.filter(budget=self).all()
+        for mon in range(1, 13):
+            monthly_values = {}
+            baseline = qset_bdgt \
+                .filter(bdgt_type='bsl', month__lte=mon, category=category) \
+                .aggregate(Sum('amount'))['amount__sum']
+            if baseline is None: baseline = 0
+            special = qset_bdgt \
+                .filter(bdgt_type='spc', month=mon, category=category) \
+                .aggregate(Sum('amount'))['amount__sum']
+            if special is None: special = 0
+            tot_budget = baseline + special
+            expenses = qset_trns \
+                .filter(trns_type='exp', month=mon, category=category) \
+                .aggregate(Sum('amount'))['amount__sum']
+            if expenses is None: expenses = 0
+            liabilities = qset_trns \
+                .filter(trns_type='lia', month=mon, category=category) \
+                .aggregate(Sum('amount'))['amount__sum']
+            if liabilities is None: liabilities = 0
+            tot_outcome = expenses + liabilities
+            income = qset_trns \
+                .filter(trns_type='inc', month=mon, category=category) \
+                .aggregate(Sum('amount'))['amount__sum']
+            if income is None: income = 0
+            monthly_values['month'] = mon
+            monthly_values['baseline'] = '{:,}'.format(baseline)
+            monthly_values['special'] = '{:,}'.format(special)
+            monthly_values['tot_budget'] = '{:,}'.format(tot_budget)
+            monthly_values['expenses'] = '{:,}'.format(expenses)
+            monthly_values['liabilities'] = '{:,}'.format(liabilities)
+            monthly_values['tot_outcome'] = '{:,}'.format(tot_outcome)
+            monthly_values['income'] = '{:,}'.format(income)
+            result.append(monthly_values)
+        return result
+
+    def get_yearly_values(self):
+        categories = Category.objects.all()
+        yearly_values = []
+        for cat in categories:
+            monthly_values = {
+                'category': cat.name,
+                'values': self.get_monthly_values(cat)}
+            yearly_values.append(monthly_values)
+        return yearly_values
 
 
 class Category(models.Model):

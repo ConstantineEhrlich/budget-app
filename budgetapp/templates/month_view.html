@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load customtags %}
+
+{% block content %}
+    <h3>Budget summary for {{ month|month_long }}:</h3>
+    <table class="table table-hover table-sm table-bordered">
+        <thead class="table-light">
+        <th>Category</th>
+        <th style="text-align: center">Expenses</th>
+        <th style="text-align: center">Liabities</th>
+        <th style="text-align: center">Total Outcome</th>
+        <th style="text-align: center">Baseline</th>
+        <th style="text-align: center">Special</th>
+        <th style="text-align: center">Total Budget</th>
+        </thead>
+        {% for category in data %}
+            <tr>
+                <td style="text-align: left"><b>{{ category.category }}</b></td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.expenses }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.liabilities }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.tot_outcome }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.baseline }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.special }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.tot_budget }}{% endif %}{% endfor %}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
