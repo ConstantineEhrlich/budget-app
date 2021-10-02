@@ -146,7 +146,7 @@ class Budget(models.Model):
     def get_yearly_values(self):
         categories = Category.objects.all()
         yearly_values = []
-        for cat in categories:
+        for cat in categories.filter(code__gt=10):
             monthly_values = {
                 'category': cat.name,
                 'values': self.get_monthly_values(cat)}

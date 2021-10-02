@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
     <h3>Expense summary by month:</h3>
-    <table class="table table-hover table-sm table-bordered">
+    <table class="table table-hover table-sm table-bordered table-striped">
         <thead class="table-light">
         <th>Category</th>
         {% for per in periods %}
@@ -15,7 +17,9 @@
             <tr>
                 <td><b>{{ i.name }}</b></td>
                 {% for mon in i.sums %}
-                    <td style="text-align: right">{{ mon }}
+                    <td style="text-align: right; font-family: monospace">
+
+                    {{ mon }}
                 {% endfor %}
             </tr>
         {% endfor %}

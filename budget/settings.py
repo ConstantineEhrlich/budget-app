@@ -127,3 +127,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect after login
+
+LOGIN_REDIRECT_URL = '/'
+
+# Email backend for login reset testing:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

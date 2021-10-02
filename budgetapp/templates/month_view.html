@@ -3,25 +3,25 @@
 
 {% block content %}
     <h3>Budget summary for {{ month|month_long }}:</h3>
-    <table class="table table-hover table-sm table-bordered">
+    <table class="table table-hover table-sm table-bordered table-striped">
         <thead class="table-light">
-        <th>Category</th>
-        <th style="text-align: center">Expenses</th>
-        <th style="text-align: center">Liabities</th>
-        <th style="text-align: center">Total Outcome</th>
-        <th style="text-align: center">Baseline</th>
-        <th style="text-align: center">Special</th>
-        <th style="text-align: center">Total Budget</th>
+        <th style="vertical-align: middle">Category</th>
+        <th style="text-align: center; vertical-align: middle">Expenses</th>
+        <th style="text-align: center; vertical-align: middle">Liabities</th>
+        <th style="text-align: center; vertical-align: middle">Total<br>Outcome</th>
+        <th style="text-align: center; vertical-align: middle">Baseline</th>
+        <th style="text-align: center; vertical-align: middle">Special</th>
+        <th style="text-align: center; vertical-align: middle">Total<br>Budget</th>
         </thead>
         {% for category in data %}
             <tr>
-                <td style="text-align: left"><b>{{ category.category }}</b></td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.expenses }}{% endif %}{% endfor %}</td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.liabilities }}{% endif %}{% endfor %}</td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.tot_outcome }}{% endif %}{% endfor %}</td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.baseline }}{% endif %}{% endfor %}</td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.special }}{% endif %}{% endfor %}</td>
-                <td style="text-align: right">{% for i in category.values %}{% if i.month == month %}{{ i.tot_budget }}{% endif %}{% endfor %}</td>
+                <td style="text-align: left; width: 16%"><b>{{ category.category }}</b></td>
+                <td style="text-align: right; width: 12%; font-family: monospace">{% for i in category.values %}{% if i.month == month %}{{ i.expenses }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right; width: 12%; font-family: monospace">{% for i in category.values %}{% if i.month == month %}{{ i.liabilities }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right; width: 12%; font-family: monospace"><b>{% for i in category.values %}{% if i.month == month %}{{ i.tot_outcome }}{% endif %}{% endfor %}</b></td>
+                <td style="text-align: right; width: 12%; font-family: monospace">{% for i in category.values %}{% if i.month == month %}{{ i.baseline }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right; width: 12%; font-family: monospace">{% for i in category.values %}{% if i.month == month %}{{ i.special }}{% endif %}{% endfor %}</td>
+                <td style="text-align: right; width: 12%; font-family: monospace"><b>{% for i in category.values %}{% if i.month == month %}{{ i.tot_budget }}{% endif %}{% endfor %}</b></td>
             </tr>
         {% endfor %}
     </table>

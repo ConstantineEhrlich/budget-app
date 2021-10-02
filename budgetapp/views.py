@@ -1,5 +1,3 @@
-from typing import List, Union, Dict, Any
-
 # TODO Implement User Model and add Login, Register, etc
 # TODO Create ListView, DetiailView, AddView for each model: Budget, Budget_Line, Outcome, Income, Category
 
@@ -8,6 +6,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db.models import *
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 
 from .models import *
@@ -35,6 +34,7 @@ def index(request):
     # .values('name')\
     # .annotate(amount=Sum('transaction__amount'))
 
+
     context = {
         'expenses': get_monthly_expenses(),
         'periods': periods
@@ -48,7 +48,7 @@ def test_request(request):
     return HttpResponse(context)
 
 
-class MonthlyBudgetView(generic.TemplateView):
+class MonthlyBudgetView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'month_view.html'
 
     def get_context_data(self, **kwargs):
