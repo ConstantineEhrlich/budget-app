@@ -34,7 +34,6 @@ def index(request):
     # .values('name')\
     # .annotate(amount=Sum('transaction__amount'))
 
-
     context = {
         'expenses': get_monthly_expenses(),
         'periods': periods
@@ -46,6 +45,20 @@ def test_request(request):
     context = {}
     context['variable'] = 'value'
     return HttpResponse(context)
+
+
+class TransactionEntryView(LoginRequiredMixin, generic.CreateView):
+    model = Transaction
+    template_name = 'transaction_entry.html'
+    fields = ['budget',
+              'trns_type',
+              'year',
+              'month',
+              'user',
+              'category',
+              'description',
+              'finalized',
+              'amount']
 
 
 class MonthlyBudgetView(LoginRequiredMixin, generic.TemplateView):

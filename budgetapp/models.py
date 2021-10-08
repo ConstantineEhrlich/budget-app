@@ -1,6 +1,7 @@
 import csv
 from django.db import models
 from datetime import datetime
+from django.conf import settings
 
 from django.db.models import Max, Sum
 from django.db.models.functions import Coalesce
@@ -27,11 +28,10 @@ from django.urls import reverse
 # TODO update Budget_Line.save() so if the category is not open for expense or liability it will become open
 
 
-
-
-
 # Create your models here.
-class Transaction(models.Model):
+
+
+class Transaction_Old(models.Model):
     trns_types = [('exp', 'Expense'), ('lia', 'Liability'), ('inc', 'Income')]
     budget = models.ForeignKey('Budget', on_delete=models.PROTECT, to_field='code', verbose_name='Budget')
     trns_type = models.CharField(max_length=3, choices=trns_types, default='exp', verbose_name='Transaction Type')
@@ -41,8 +41,9 @@ class Transaction(models.Model):
     year = models.PositiveSmallIntegerField(default=timezone.now().year, verbose_name='Year')
     month = models.PositiveSmallIntegerField(default=timezone.now().month, verbose_name='Month')
     category = models.ForeignKey('Category', on_delete=models.PROTECT, to_field='code')
-    user = models.CharField(max_length=3)
-    #   user = models.ForeignKey(models.User, on_delete=models.PROTECT)
+    # user = models.CharField(max_length=3)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='username', verbose_name='User',
+                             on_delete=models.PROTECT)
     description = models.CharField(max_length=255)
     finalized = models.BooleanField()
     amount = models.DecimalField(max_digits=7, decimal_places=2)
@@ -68,7 +69,8 @@ class Budget_Line(models.Model):
     year = models.PositiveSmallIntegerField(default=timezone.now().year, verbose_name='Year')
     month = models.PositiveSmallIntegerField(default=timezone.now().month, verbose_name='Month')
     category = models.ForeignKey('Category', on_delete=models.PROTECT, to_field='code')
-    user = models.CharField(max_length=3)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='username', verbose_name='User',
+                             on_delete=models.PROTECT)
     #   user = models.ForeignKey(models.User (model), on_delete=models.PROTECT)
     description = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
@@ -246,3 +248,58 @@ def get_monthly_expenses():
     result['sums'] = sums
     response.append(result)
     return response
+
+
+#######################################################################################################################
+#                                                                                                                     #
+#######################################################################################################################
+
+class Transaction(models.Model):
+    class Meta:
+        abstract = True
+
+    budget = models.ForeignKey(
+        'Budget',
+        on_delete=models.PROTECT,
+        to_field='code',
+        verbose_name='Budget')
+    timestamp = models.DateTimeField(
+        default=datetime.now(),
+        verbose_name='Timestamp')
+    year = models.PositiveSmallIntegerField(
+        default=timezone.now().year,
+        verbose_name='Year')
+    month = models.PositiveSmallIntegerField(
+        default=timezone.now().month,
+        verbose_name='Month')
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.PROTECT,
+        to_field='code')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        to_field='username',
+        verbose_name='User',
+        on_delete=models.PROTECT)
+    description = models.CharField(
+        max_length=255)
+    amount = models.DecimalField(
+        max_digits=7,
+        decimal_places=2)
+    finalized = models.BooleanField()
+
+
+class Outcome(Transaction):
+    class Meta:
+        verbose_name = 'Outcome transaction'
+        verbose_name_plural = 'Outcome transactions'
+
+    trns_types = [
+        ('exp', 'Expense'),
+        ('lia', 'Liability')]
+    trns_type = models.CharField(
+        max_length=3,
+        choices=trns_types,
+        default='exp',
+        verbose_name='Transaction Type')
+

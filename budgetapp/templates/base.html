@@ -40,7 +40,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
                     <a class="nav-link" href="{% url 'index' %}">Year view</a>
-                    <a class="nav-link" href="{% url 'monthly_budget' %}">Month view</a>
+                    <a class="nav-link" href="{% url 'monthly_budget'%}">Month view</a>
+                    <a class="nav-link" href="{% url 'transaction_entry' %}">Transaction Entry</a>
                 </div>
                 <div class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
