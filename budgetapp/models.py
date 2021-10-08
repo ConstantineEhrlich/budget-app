@@ -5,6 +5,7 @@ from django.conf import settings
 
 from django.db.models import Max, Sum
 from django.db.models.functions import Coalesce
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
 
@@ -174,6 +175,7 @@ class Category(models.Model):
 #######################################################################################################################
 
 def import_csv_file(path_to_csv_file, target):
+    User = get_user_model()
     # target can be one of the following:
     targets = ['otcm', 'incm', 'bdgt']
     if target not in targets:
@@ -188,20 +190,22 @@ def import_csv_file(path_to_csv_file, target):
         print('Importing line:', counter)
         params = {
             'budget': Budget.objects.get(code=str(row[0])),
-            target + '_type': row[1],
+            'trns_type': row[1],
             'timestamp': timezone.make_aware(datetime(int(row[2]), int(row[3]), int(row[4]), 12, 0, 0)),
             'year': int(row[2]),
             'month': int(row[3]),
             'category': Category.objects.get(name=row[5]),
-            'user': row[6],
+            'user': User.objects.filter(username=row[6]).get(),
             'description': row[7],
             'amount': row[9],
             'finalized': True
         }
         if target == 'bdgt':
             new_trans = Budget_Line(**params)
-        if target == 'trns':
-            new_trans = Transaction(**params)
+        if target == 'otcm':
+            new_trans = Outcome(**params)
+        if target == 'incm':
+            new_trans = Income(**params)
         new_trans.save()
 
 def refresh_data():
@@ -213,9 +217,13 @@ def refresh_data():
     imp_liabilities = '/Users/constantine/Documents/Python/budget/modeling/imp_liabilities.csv'
     imp_incomes = '/Users/constantine/Documents/Python/budget/modeling/imp_incomes.csv'
 
+    print('Importing imp_budgets')
     import_csv_file(imp_budgets, 'bdgt')
+    print('Importing imp_expenses')
     import_csv_file(imp_expenses, 'otcm')
+    print('Importing imp_liabilities')
     import_csv_file(imp_liabilities, 'otcm')
+    print('Importing imp_incomes')
     import_csv_file(imp_incomes, 'incm')
 
 #######################################################################################################################
