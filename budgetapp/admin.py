@@ -4,5 +4,6 @@ from .models import *
 # Register your models here.
 admin.site.register(Category)
 admin.site.register(Budget)
-admin.site.register(Transaction)
+admin.site.register(Income)
+admin.site.register(Outcome)
 admin.site.register(Budget_Line)
