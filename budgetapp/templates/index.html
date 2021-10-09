@@ -3,25 +3,7 @@
 {% block content %}
 
 
-    <h3>Expense summary by month:</h3>
-    <table class="table table-hover table-sm table-bordered table-striped">
-        <thead class="table-light">
-        <th>Category</th>
-        {% for per in periods %}
-            <th style="text-align: center">
-                <a href="{% url 'monthly_budget' per.num %}">{{ per.short_name }}</a>
-            </th>
-        {% endfor %}
-        </thead>
-        {% for i in expenses %}
-            <tr>
-                <td><b>{{ i.name }}</b></td>
-                {% for mon in i.sums %}
-                    <td style="text-align: right; font-family: monospace">
+    <h3>Test</h3>
+    <p>{{ test }}</p>
 
-                    {{ mon }}
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
 {% endblock %}

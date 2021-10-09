@@ -24,14 +24,30 @@ from django.urls import reverse
 # TODO Add for_budget, for_year, for_month and for_category
 # TODO Add abstract class "transaction" and then three inherited classes: Budget_Line, Outcome, Income
 # TODO Add foreign key to Categories - budget
-# TODO Add BooleanField() to Categories - income, expense, liability, budget - if the category applicable to this trans type
-# TODO Add for_income, for_expense, for_liability, for_budget to the Category
+
 # TODO update Budget_Line.save() so if the category is not open for expense or liability it will become open
 
 
 #######################################################################################################################
 # Models                                                                                                             #
 #######################################################################################################################
+
+class TransactionModelManager(models.Manager):
+    def for_budget(self, budget):
+        qs = super().get_queryset()
+        qs = qs.filter(budget=budget)
+        return qs
+
+    def for_year(self, year):
+        qs = super().get_queryset()
+        qs = qs.filter(year=year)
+        return qs
+
+    def for_month(self, month):
+        qs = super().get_queryset()
+        qs = qs.filter(month=month)
+        return qs
+
 
 class Transaction(models.Model):
     budget = models.ForeignKey(
@@ -63,6 +79,8 @@ class Transaction(models.Model):
         max_digits=7,
         decimal_places=2)
     finalized = models.BooleanField()
+
+    objects = TransactionModelManager()
 
     class Meta:
         abstract = True
@@ -153,11 +171,26 @@ class Budget(models.Model):
 
 
 class Category(models.Model):
+    budget = models.ForeignKey(
+        'Budget',
+        on_delete=models.PROTECT)
     code = models.PositiveSmallIntegerField(
         primary_key=True)
     name = models.CharField(
         max_length=127,
         unique=True)
+    allow_inc = models.BooleanField(
+        default=True,
+        verbose_name='Income')
+    allow_exp = models.BooleanField(
+        default=True,
+        verbose_name='Expense')
+    allow_lia = models.BooleanField(
+        default=True,
+        verbose_name='Liability')
+    allow_bdg = models.BooleanField(
+        default=True,
+        verbose_name='Budget')
 
     class Meta:
         verbose_name = 'Category'
@@ -168,6 +201,28 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('model-detail-view', args=[str(self.code)])
+
+
+class UserBudget(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        to_field='username',
+        verbose_name='User',
+        on_delete=models.PROTECT)
+    budget = models.ForeignKey(
+        'Budget',
+        on_delete=models.PROTECT,
+        to_field='code',
+        verbose_name='Budget')
+    allowed = models.BooleanField()
+    default = models.BooleanField()
+
+    class Meta:
+        verbose_name = 'Budget permission'
+        verbose_name_plural = 'Budget permissions'
+
+    def __str__(self):
+        return self.user + ' on '
 
 
 #######################################################################################################################
@@ -207,6 +262,7 @@ def import_csv_file(path_to_csv_file, target):
         if target == 'incm':
             new_trans = Income(**params)
         new_trans.save()
+
 
 def refresh_data():
     Outcome.objects.all().delete()
@@ -280,14 +336,7 @@ def refresh_data():
 #     return yearly_values
 
 
-
-
-
-
-
-
 # def get_monthly_expenses():
-#     # TODO move this logic into Budget class
 #     response = []
 #     qset = Transaction.objects.all()
 #     # run through categories
